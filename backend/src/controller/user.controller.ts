@@ -12,6 +12,8 @@ export class UserController {
                 data: users,
             });
         } catch (error) {
+            console.log(error);
+
             next(error);
         }
     };
