@@ -1,6 +1,7 @@
 import { UserRepository } from '../repository/user.repository.js';
 import type { User, UserCreateData, UserUpdateData } from '../model/user.model.js';
 import { NotFoundException, ConflictException } from '../exception/http.exception.js';
+import { userQueue } from '../queue/user.queue.js';
 
 export class UserService {
     constructor(private userRepository: UserRepository) { }
@@ -22,7 +23,16 @@ export class UserService {
         if (existingUser) {
             throw new ConflictException('Email already exists');
         }
-        return await this.userRepository.create(userData);
+        const created = await this.userRepository.create(userData);
+
+        // async işlem: kuyruğa job at (email, audit log, vs.)
+        await userQueue.add(
+            'user.created',
+            { userId: created.id, email: created.email, name: created.name },
+            { attempts: 3, backoff: { type: 'exponential', delay: 1000 } }
+        );
+
+        return created;
     }
 
     async updateUser(id: number, userData: UserUpdateData): Promise<User> {
