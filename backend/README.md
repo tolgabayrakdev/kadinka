@@ -1,6 +1,14 @@
 # 🚀 Backend API
 
-Spring Boot benzeri mimari yapı ile oluşturulmuş Node.js/TypeScript backend projesi.
+Spring Boot benzeri mimari yapı ile oluşturulmuş **Node.js / TypeScript** backend projesi.
+
+Bu proje;
+- **Katmanlı mimari**
+- **Dependency Injection (DI)**
+- **Event-Driven Architecture**
+yaklaşımıyla tasarlanmıştır.
+
+---
 
 ## 📚 Dokümantasyon
 
@@ -11,9 +19,46 @@ Spring Boot benzeri mimari yapı ile oluşturulmuş Node.js/TypeScript backend p
 Bu dokümantasyonda şunları bulacaksınız:
 - ✅ Mimari yapı açıklaması
 - ✅ Dependency Injection (DI) nasıl çalışır?
+- ✅ Event-Driven Architecture yaklaşımı
+- ✅ Queue & Worker yapısı (BullMQ)
+- ✅ Async işlemler (email, audit, notification)
 - ✅ Yeni feature ekleme adım adım rehberi
-- ✅ Örnek: Payment feature ekleme
+- ✅ Örnek: Payment feature + event & queue entegrasyonu
 - ✅ Katmanlar ve sorumluluklar
+
+---
+
+## ⚡ Event-Driven Architecture
+
+Bu proje, **HTTP request’leri** ile **arka plan işlemlerini (side-effects)** birbirinden ayırmak için  
+**Event-Driven Architecture** kullanır.
+
+### 🎯 Event ne zaman kullanılır?
+- 📧 Email gönderimi
+- 🧾 Audit / activity log
+- 🔔 Notification
+- 📊 Analytics
+- 💳 Payment sonrası işlemler
+
+### 🔄 Akış
+
+```
+HTTP Request
+   ↓
+Controller
+   ↓
+Service
+   ↓
+Domain Event (ör: user.created)
+   ↓
+Queue (BullMQ)
+   ↓
+Worker
+   ↓
+Side Effects (mail, audit, notification)
+```
+
+---
 
 ## 🚀 Hızlı Başlangıç
 
@@ -21,97 +66,44 @@ Bu dokümantasyonda şunları bulacaksınız:
 
 - Node.js (v18+)
 - PostgreSQL
+- Redis
 - npm veya yarn
 
 ### Kurulum
 
 ```bash
-# Bağımlılıkları yükle
 npm install
-
-# Environment değişkenlerini ayarla
 cp .env.example .env
-
-# Server'ı başlat
 npm run dev
+npm run worker:user
 ```
+
+---
 
 ## 📁 Proje Yapısı
 
 ```
 backend/
 ├── src/
-│   ├── config/              # Konfigürasyon ve DI
+│   ├── config/              # Konfigürasyon, DI ve queue ayarları
 │   ├── controller/          # HTTP controllers
 │   ├── service/             # Business logic
 │   ├── repository/          # Database access
 │   ├── routes/              # Route definitions
 │   ├── dto/                 # Data Transfer Objects
 │   ├── model/               # Domain models
+│   ├── queue/               # Queue definitions (BullMQ)
+│   ├── worker/              # Background workers
 │   └── middleware/          # Express middleware
-└── ARCHITECTURE.md          # Detaylı mimari dokümantasyonu
+└── ARCHITECTURE.md
 ```
-
-## 🔧 Yeni Feature Ekleme
-
-Yeni bir feature eklemek için [`ARCHITECTURE.md`](./ARCHITECTURE.md#yeni-feature-ekleme-rehberi) dosyasındaki adımları takip edin.
-
-### Kısa Özet
-
-1. **Repository** oluştur (`repository/[feature].repository.ts`)
-2. **Service** oluştur (`service/[feature].service.ts`)
-3. **Controller** oluştur (`controller/[feature].controller.ts`)
-4. **Module** oluştur (`config/modules/[feature].module.ts`)
-5. **Routes** oluştur (`routes/[feature].routes.ts`)
-6. `app.context.ts`'e module'ü ekle
-7. `server.ts`'e route'u ekle
-
-## 🏗️ Mimari Prensipler
-
-- ✅ **Controller → Service → Repository** katmanlı yapı
-- ✅ **Dependency Injection** ile gevşek bağlı bileşenler
-- ✅ **Type-safe** container kullanımı
-- ✅ **Modüler yapı** - Her feature kendi module'üne sahip
-- ✅ **Separation of Concerns** - Her katman kendi sorumluluğuna odaklanır
-
-## 📝 API Endpoints
-
-### Health Check
-```
-GET /health
-```
-
-### Users
-```
-GET    /api/v1/users
-GET    /api/v1/users/:id
-POST   /api/v1/users
-PUT    /api/v1/users/:id
-DELETE /api/v1/users/:id
-```
-
-## 🧪 Test
-
-```bash
-# Tüm testleri çalıştır
-npm test
-
-# Test UI'ı ile çalıştır
-npm run test:ui
-
-# Coverage raporu
-npm run test:coverage
-```
-
-**Detaylı test dokümantasyonu:** [`TESTING.md`](./TESTING.md)
-
-## 🔗 İlgili Dokümantasyon
-
-- [Mimari Dokümantasyonu](./ARCHITECTURE.md) - Detaylı mimari açıklaması
-- [Test Dokümantasyonu](./TESTING.md) - Test yazma rehberi
-- [Dependency Injection Nasıl Çalışır?](./ARCHITECTURE.md#dependency-injection-di-nasıl-çalışır)
-- [Yeni Feature Ekleme Rehberi](./ARCHITECTURE.md#yeni-feature-ekleme-rehberi)
 
 ---
 
-**Sorularınız için:** [`ARCHITECTURE.md`](./ARCHITECTURE.md) dosyasını inceleyin.
+## 🏗️ Mimari Prensipler
+
+- Controller → Service → Repository
+- Event-Driven Architecture
+- Dependency Injection
+- Modüler yapı
+- Separation of Concerns
